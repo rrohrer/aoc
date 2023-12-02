@@ -63,6 +63,23 @@ impl Hand {
 
         return true;
     }
+
+    fn find_power(hands: &Vec<Hand>) -> i32 {
+        let mut minimum = Hand::new();
+        for h in hands {
+            if h.red > minimum.red {
+                minimum.red = h.red;
+            }
+            if h.green > minimum.green {
+                minimum.green = h.green;
+            }
+            if h.blue > minimum.blue {
+                minimum.blue = h.blue;
+            }
+        }
+
+        return minimum.red * minimum.blue * minimum.green;
+    }
 }
 
 fn main() -> io::Result<()> {
@@ -73,15 +90,19 @@ fn main() -> io::Result<()> {
 
     let mut counter = 1;
     let mut sum = 0;
+    let mut sum_power = 0;
     for line in reader.lines() {
         let hands = Hand::from_game(line.unwrap());
         if base_hand.is_possible(&hands) {
             sum += counter;
         }
         counter += 1;
+
+        sum_power += Hand::find_power(&hands);
     }
 
     println!("{}", sum);
+    println!("{}", sum_power);
 
     Ok(())
 }
