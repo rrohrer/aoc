@@ -46,6 +46,9 @@ bool is_digit(char c) { return c >= '0' && c <= '9'; }
 
 int process_number(grid_t *g, int x, int y) {
   char *c = g_index(g, x, y);
+  if (c == NULL || *c == '.' || !is_digit(*c))
+    return 0;
+
   while (c != NULL && is_digit(*c))
     c = g_index(g, ++x, y);
 
