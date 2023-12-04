@@ -85,9 +85,8 @@ int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
 
-  grid_t grid = new_grid("small_input.txt");
+  grid_t grid = new_grid("input.txt");
 
-  printf("%s", grid.data);
   printf("width: %d, height: %d\n", grid.width, grid.height);
 
   int sum = 0;
