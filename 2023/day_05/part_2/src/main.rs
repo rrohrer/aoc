@@ -90,28 +90,17 @@ impl InputMap {
 
 fn main() {
     let mapping = InputMap::new("input.txt");
-    let mut items = Vec::new();
+
+    let mut min = usize::MAX;
 
     for i in (0..mapping.seeds.len()).step_by(2) {
         let start = mapping.seeds[i];
         let len = mapping.seeds[i + 1];
 
         for j in start..start + len {
-            items.push(mapping.map_seed(j));
+            min = usize::min(mapping.map_seed(j), min);
         }
     }
 
-    items.sort();
-
-    println!("{}", items[0]);
-    /*
-    for s in mapping.seeds.iter() {
-        println!("{} ", s);
-    }
-
-    mapping.data.iter().for_each(|x| {
-        x.iter()
-            .for_each(|y| println!("{} {} {}", y.dest, y.src, y.len));
-        println!(" ");
-    });*/
+    println!("{}", min);
 }
