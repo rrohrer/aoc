@@ -36,17 +36,9 @@ impl FromStr for Card {
 
 impl Card {
     fn score(&self) -> i32 {
-        self.values.iter().fold(0, |a, x| {
-            if self.winners.contains(x) {
-                if a == 0 {
-                    1
-                } else {
-                    a * 2
-                }
-            } else {
-                a
-            }
-        })
+        self.values
+            .iter()
+            .fold(0, |a, x| if self.winners.contains(x) { a + 1 } else { a })
     }
 }
 
@@ -54,12 +46,23 @@ fn main() -> io::Result<()> {
     let file = File::open("input.txt")?;
     let reader = BufReader::new(file);
 
-    let points = reader
+    let cards = reader
         .lines()
         .filter_map(|l| Card::from_str(&l.unwrap()).ok())
-        .fold(0, |a, c| a + c.score());
+        .collect::<Vec<_>>();
 
-    println!("points: {}", points);
+    let mut card_counts = Vec::with_capacity(cards.len());
+    card_counts.resize(cards.len(), 1);
+
+    for i in 0..card_counts.len() {
+        let score = cards[i].score();
+        for j in 0..score as usize {
+            card_counts[i + j + 1] += card_counts[i];
+        }
+    }
+
+    let sum = card_counts.iter().fold(0, |a, x| a + x);
+    println!("number of cards: {}", sum);
 
     Ok(())
 }
