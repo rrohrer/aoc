@@ -99,14 +99,4 @@ fn main() {
     items.sort();
 
     println!("{}", items[0]);
-    /*
-    for s in mapping.seeds.iter() {
-        println!("{} ", s);
-    }
-
-    mapping.data.iter().for_each(|x| {
-        x.iter()
-            .for_each(|y| println!("{} {} {}", y.dest, y.src, y.len));
-        println!(" ");
-    });*/
 }
