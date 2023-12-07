@@ -23,7 +23,6 @@ enum Card {
     Eight,
     Nine,
     Ten,
-    Jack,
     Queen,
     King,
     Ace,
@@ -113,8 +112,13 @@ impl FromStr for Hand {
 
         let mut histogram = [0; 13];
         cards.iter().for_each(|c| histogram[*c as usize] += 1);
+        let jokers = histogram[Card::Joker as usize];
+        histogram[Card::Joker as usize] = 0;
         histogram.sort();
-        let kind = match histogram[12] {
+
+        let adjusted = histogram[12] + jokers;
+
+        let kind = match adjusted {
             5 => HandType::FiveOfAKind,
             4 => HandType::FourOfAKind,
             3 => {
@@ -133,6 +137,7 @@ impl FromStr for Hand {
             }
             _ => HandType::HighCard,
         };
+
         Ok(Hand { cards, bid, kind })
     }
 }
