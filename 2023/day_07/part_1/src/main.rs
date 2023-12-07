@@ -1,0 +1,107 @@
+use std::str::FromStr;
+
+#[derive(Debug)]
+enum HandType {
+    HighCard,
+    Pair,
+    TwoPair,
+    ThreeOfAKind,
+    FullHouse,
+    FourOfAKind,
+    FiveOfAKind,
+}
+
+#[derive(Debug, Copy, Clone)]
+enum Card {
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Jack,
+    Queen,
+    King,
+    Ace,
+}
+
+impl Card {
+    fn new(c: char) -> Self {
+        use Card::*;
+        match c {
+            '2' => Two,
+            '3' => Three,
+            '4' => Four,
+            '5' => Five,
+            '6' => Six,
+            '7' => Seven,
+            '8' => Eight,
+            '9' => Nine,
+            'T' => Ten,
+            'J' => Jack,
+            'Q' => Queen,
+            'K' => King,
+            'A' => Ace,
+            _ => panic!("This shouldn't happen"),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct Hand {
+    cards: [Card; 5],
+    kind: HandType,
+    bid: usize,
+}
+
+impl FromStr for Hand {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut parts = s.split(" ");
+        let mut c = parts.next().unwrap().chars().map(|c| Card::new(c));
+        let cards = [
+            c.next().ok_or("Failed to unwrap")?,
+            c.next().unwrap(),
+            c.next().unwrap(),
+            c.next().unwrap(),
+            c.next().unwrap(),
+        ];
+        let bid = parts.next().unwrap().trim().parse::<usize>().unwrap();
+
+        let mut histogram = [0; 13];
+        cards.iter().for_each(|c| histogram[*c as usize] += 1);
+        histogram.sort();
+        let kind = match histogram[12] {
+            5 => HandType::FiveOfAKind,
+            4 => HandType::FourOfAKind,
+            3 => {
+                if histogram[11] == 2 {
+                    HandType::FullHouse
+                } else {
+                    HandType::ThreeOfAKind
+                }
+            }
+            2 => {
+                if histogram[11] == 2 {
+                    HandType::TwoPair
+                } else {
+                    HandType::Pair
+                }
+            }
+            _ => HandType::HighCard,
+        };
+        Ok(Hand { cards, bid, kind })
+    }
+}
+
+fn main() {
+    let input = include_str!("../small_input.txt");
+    let hands: Vec<_> = input
+        .split("\n")
+        .filter_map(|h| Hand::from_str(h).ok())
+        .collect();
+    println!("{:?}", hands);
+}
