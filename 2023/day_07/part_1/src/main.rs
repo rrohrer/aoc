@@ -1,6 +1,6 @@
-use std::str::FromStr;
+use std::{cmp::Ordering, str::FromStr};
 
-#[derive(Debug)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
 enum HandType {
     HighCard,
     Pair,
@@ -11,7 +11,7 @@ enum HandType {
     FiveOfAKind,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 enum Card {
     Two,
     Three,
@@ -57,6 +57,45 @@ struct Hand {
     bid: usize,
 }
 
+impl Ord for Hand {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        let cmp = self.kind.cmp(&other.kind);
+        if cmp != Ordering::Equal {
+            return cmp;
+        }
+
+        for i in 0..5 {
+            let cmp = self.cards[i].cmp(&other.cards[i]);
+            if cmp != Ordering::Equal {
+                return cmp;
+            }
+        }
+
+        Ordering::Equal
+    }
+}
+
+impl PartialOrd for Hand {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for Hand {
+    fn eq(&self, other: &Self) -> bool {
+        if self.kind == other.kind {
+            for i in 0..5 {
+                if self.cards[i] != other.cards[i] {
+                    return false;
+                }
+            }
+        }
+        false
+    }
+}
+
+impl Eq for Hand {}
+
 impl FromStr for Hand {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -98,10 +137,14 @@ impl FromStr for Hand {
 }
 
 fn main() {
-    let input = include_str!("../small_input.txt");
-    let hands: Vec<_> = input
+    let input = include_str!("../input.txt");
+
+    let mut hands: Vec<_> = input
         .split("\n")
         .filter_map(|h| Hand::from_str(h).ok())
         .collect();
-    println!("{:?}", hands);
+    hands.sort();
+
+    let result: usize = hands.iter().enumerate().map(|(i, x)| (i + 1) * x.bid).sum();
+    println!("{:?}", result);
 }
