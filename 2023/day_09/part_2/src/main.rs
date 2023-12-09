@@ -13,7 +13,11 @@ fn calculate(v: &Vec<i64>) -> i64 {
         done = row.iter().all(|x| *x == 0);
         table.push(row);
     }
-    table.iter().rev().map(|l| l.last().unwrap()).sum()
+    table
+        .iter()
+        .rev()
+        .map(|l| l.first().unwrap())
+        .fold(0, |a, b| b - a)
 }
 
 fn main() {
