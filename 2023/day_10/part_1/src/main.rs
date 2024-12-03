@@ -100,7 +100,7 @@ fn flood_fill(
 }
 
 fn main() {
-    let input = include_str!("../small_input.txt");
+    let input = include_str!("../input.txt");
     let grid = input
         .split("\n")
         .filter(|s| !s.is_empty())
